@@ -2,59 +2,104 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Prompt Generator</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; }
-    #mode-switch { margin-bottom: 10px; }
-    .mode-button {
-      padding: 8px 15px;
-      margin-right: 8px;
-      border: 1px solid #333;
-      background: #eee;
-      cursor: pointer;
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
     }
+
+    .mode-button {
+      margin: 0.2rem;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #eee;
+    }
+
     .mode-button.active {
-      background: #333;
+      background-color: #007bff;
       color: white;
     }
-    #prompt {
+
+    .mode-section {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    textarea {
       width: 100%;
-      height: 120px;
-      padding: 10px;
-      font-size: 16px;
-      box-sizing: border-box;
-      margin-bottom: 10px;
+      height: 160px;
+      margin-top: 1rem;
     }
-    #generate {
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
+
+    button[type="submit"] {
+      margin-top: 1rem;
     }
-    #output {
-      margin-top: 15px;
-      white-space: pre-wrap;
-      background: #f4f4f4;
-      padding: 15px;
-      border-radius: 4px;
-      min-height: 80px;
+
+    #loading {
+      display: none;
+      margin-left: 0.5rem;
+      color: gray;
     }
   </style>
 </head>
 <body>
   <h1>Prompt Generator</h1>
 
-  <div id="mode-switch">
-    <button class="mode-button active" data-mode="prompt-image">Mode Prompt Gambar</button>
-    <button class="mode-button" data-mode="prompt-video">Mode Prompt Video Scene</button>
-    <button class="mode-button" data-mode="prompt-narasi">Mode Prompt Narasi</button>
+  <div>
+    <button class="mode-button active" data-mode="image">Prompt Gambar</button>
+    <button class="mode-button" data-mode="video">Prompt Video Scene</button>
+    <button class="mode-button" data-mode="narrative">Prompt Narasi</button>
   </div>
 
-  <textarea id="prompt" placeholder="Masukkan prompt di sini..."></textarea><br />
+  <form id="promptForm">
+    <!-- Mode Gambar -->
+    <div class="mode-section" id="mode-image" style="display: block;">
+      <label>Subjek:</label>
+      <input type="text" id="image-subject" placeholder="Contoh: seorang pemuda di tepi laut" required />
+      <br/>
+      <label>Aksi:</label>
+      <input type="text" id="image-action" placeholder="Contoh: sedang menatap cakrawala" required />
+      <br/>
+      <label>Gaya:</label>
+      <input type="text" id="image-style" placeholder="Contoh: realistik sinematik malam hari" required />
+    </div>
 
-  <button id="generate">Generate</button>
+    <!-- Mode Video -->
+    <div class="mode-section" id="mode-video">
+      <label>Deskripsi Scene:</label>
+      <input type="text" id="video-scene" placeholder="Contoh: hujan deras di jalan kota" required />
+      <br/>
+      <label>Pergerakan Kamera:</label>
+      <input type="text" id="video-movement" placeholder="Contoh: dolly zoom ke wajah karakter" required />
+      <br/>
+      <label>Tone Gambar:</label>
+      <input type="text" id="video-tone" placeholder="Contoh: gelap, misterius, dramatis" required />
+    </div>
 
-  <pre id="output"></pre>
+    <!-- Mode Narasi -->
+    <div class="mode-section" id="mode-narrative">
+      <label>Karakter:</label>
+      <input type="text" id="narrative-character" placeholder="Contoh: seorang detektif tua" required />
+      <br/>
+      <label>Setting:</label>
+      <input type="text" id="narrative-setting" placeholder="Contoh: kota yang penuh kabut" required />
+      <br/>
+      <label>Plot:</label>
+      <input type="text" id="narrative-plot" placeholder="Contoh: menyelidiki kasus hilangnya anak kecil" required />
+    </div>
+
+    <button type="submit">Generate Prompt</button>
+    <span id="loading">Enhancing prompt with DeepSeek...</span>
+  </form>
+
+  <h3>Hasil Prompt</h3>
+  <textarea id="result" readonly></textarea>
 
   <script src="script.js"></script>
 </body>
