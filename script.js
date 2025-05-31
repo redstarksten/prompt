@@ -1,94 +1,48 @@
+const modes = {
+  "prompt-image": "Prompt Gambar",
+  "prompt-video": "Prompt Video Scene",
+  "prompt-narasi": "Prompt Narasi"
+};
+
+let currentMode = "prompt-image";
+
 document.addEventListener("DOMContentLoaded", () => {
-  const promptInputs = document.getElementById("promptInputs");
-  const generateBtn = document.getElementById("generateBtn");
-  const resultContainer = document.getElementById("resultContainer");
-  const result = document.getElementById("result");
-  const modeButtons = document.querySelectorAll(".mode-btn");
+  const modeButtons = document.querySelectorAll(".mode-button");
+  const promptInput = document.getElementById("prompt");
+  const outputDiv = document.getElementById("output");
 
-  let currentMode = "image";
-
-  const modes = {
-    image: [
-      { label: "Subjek", id: "subject" },
-      { label: "Aksi", id: "action" },
-      { label: "Gaya Visual (realistik, sinematik, dll)", id: "style" }
-    ],
-    video: [
-      { label: "Subjek", id: "subject" },
-      { label: "Aksi", id: "action" },
-      { label: "Emosi", id: "emotion" },
-      { label: "Gerakan Kamera", id: "camera" }
-    ],
-    narrative: [
-      { label: "Tokoh", id: "character" },
-      { label: "Aktivitas", id: "activity" },
-      { label: "Suasana atau Emosi", id: "mood" },
-      { label: "Gaya Narasi (puitis, dokumenter, dll)", id: "tone" }
-    ]
-  };
-
-  function renderFields(mode) {
-    currentMode = mode;
-    promptInputs.innerHTML = "";
-    modes[mode].forEach(field => {
-      const label = document.createElement("label");
-      label.textContent = field.label;
-      label.htmlFor = field.id;
-
-      const input = document.createElement("input");
-      input.id = field.id;
-      input.type = "text";
-
-      promptInputs.appendChild(label);
-      promptInputs.appendChild(input);
-    });
-
-    result.textContent = "";
-    resultContainer.classList.add("hidden");
-  }
-
-  modeButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      modeButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const mode = btn.getAttribute("data-mode");
-      renderFields(mode);
+  modeButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      currentMode = button.dataset.mode;
+      document.querySelector(".mode-button.active")?.classList.remove("active");
+      button.classList.add("active");
     });
   });
 
-  generateBtn.addEventListener("click", async () => {
-    const inputs = promptInputs.querySelectorAll("input");
-    const promptParts = Array.from(inputs)
-      .map(i => i.value.trim())
-      .filter(Boolean);
-    const promptText = promptParts.join(", ");
+  document.getElementById("generate").addEventListener("click", async () => {
+    const rawPrompt = promptInput.value.trim();
+    if (!rawPrompt) return alert("Tolong masukkan prompt.");
 
-    resultContainer.classList.remove("hidden");
-
-    if (!promptText) {
-      result.textContent = "Isi semua field dulu ya!";
-      return;
-    }
-
-    result.textContent = "Enhancing prompt with DeepSeek...";
+    outputDiv.innerHTML = "<em>Enhancing prompt with DeepSeek...</em>";
 
     try {
-      const response = await fetch("https://deepseek-proxy.glitch.me", {
+      const response = await fetch("https://deepseek-proxy.glitch.me/enhance", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer sk-854cdf1e9eff4de59471892e07f581e0" // 🔁 Ganti dengan API Key asli
-        },
-        body: JSON.stringify({ prompt: promptText })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: rawPrompt })
       });
 
       const data = await response.json();
-      result.textContent = data.enhanced_prompt || "Gagal enhance dengan DeepSeek.";
+
+      if (data.enhanced_prompt) {
+        outputDiv.textContent = data.enhanced_prompt;
+      } else {
+        outputDiv.innerHTML = `<span style="color:red">Gagal meng-enhance prompt.</span>`;
+        console.error("Respon error:", data);
+      }
     } catch (error) {
-      result.textContent = "Error saat menghubungi DeepSeek: " + error.message;
+      outputDiv.innerHTML = `<span style="color:red">Error saat menghubungi server.</span>`;
+      console.error(error);
     }
   });
-
-  renderFields("image");
 });
