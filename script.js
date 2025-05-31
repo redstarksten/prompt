@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     result.textContent = "Enhancing prompt with DeepSeek...";
 
     try {
-      const response = await fetch("https://deepseek-proxy.glitch.me", {
+      const response = await fetch("https://deepseek-proxy.glitch.me/enhance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
