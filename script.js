@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     outputDiv.textContent = "Enhancing prompt with DeepSeek...";
 
     try {
-      const response = await fetch("https://deepseek-proxy.vercel.app/enhance", {
+      const response = await fetch("https://prompt-xi-coral.vercel.app/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: rawPrompt })
