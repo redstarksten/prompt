@@ -2,34 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Prompt Generator</title>
-  <script defer src="script.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .mode-btn {
+      padding: 8px 14px;
+      margin-right: 6px;
+      margin-bottom: 10px;
+      border: none;
+      background: #eee;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .mode-btn.active {
+      background: #007bff;
+      color: white;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 16px;
+      margin-top: 10px;
+      margin-right: 8px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #resultContainer {
+      margin-top: 24px;
+      padding: 16px;
+      border: 1px solid #ccc;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-  <div class="max-w-4xl mx-auto py-10 px-4">
-    <h1 class="text-3xl font-bold mb-6">Prompt Generator</h1>
+<body>
+  <h1>Prompt Generator</h1>
 
-    <!-- Mode Switch Buttons -->
-    <div class="flex space-x-2 mb-6">
-      <button class="mode-btn px-4 py-2 bg-blue-500 text-white rounded" data-mode="image">🖼️ Prompt Gambar</button>
-      <button class="mode-btn px-4 py-2 bg-green-500 text-white rounded" data-mode="video">🎬 Prompt Video Scene</button>
-      <button class="mode-btn px-4 py-2 bg-purple-500 text-white rounded" data-mode="narrative">🎙️ Prompt Narasi</button>
-    </div>
-
-    <!-- Prompt Input Area -->
-    <div id="promptInputs" class="space-y-4">
-      <!-- Dynamic fields will be inserted here -->
-    </div>
-
-    <button id="generateBtn" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Generate Prompt</button>
-
-    <!-- Result -->
-    <div id="resultContainer" class="mt-6 hidden">
-      <h2 class="text-xl font-semibold mb-2">Generated Prompt:</h2>
-      <div id="result" class="bg-white p-4 rounded shadow"></div>
-    </div>
+  <div>
+    <button class="mode-btn active" data-mode="image">Prompt Gambar</button>
+    <button class="mode-btn" data-mode="video">Prompt Video Scene</button>
+    <button class="mode-btn" data-mode="narrative">Prompt Narasi</button>
   </div>
+
+  <div id="promptInputs"></div>
+
+  <button id="generateBtn">Generate Prompt</button>
+  <button id="enhanceBtn" style="display: none;">Enhance with DeepSeek</button>
+
+  <div id="resultContainer" class="hidden">
+    <h3>Hasil Prompt:</h3>
+    <div id="result" style="white-space: pre-wrap;"></div>
+  </div>
+
+  <script defer src="script.js"></script>
 </body>
 </html>
