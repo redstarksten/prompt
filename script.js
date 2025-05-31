@@ -1,57 +1,94 @@
-const modes = {
-  "prompt-image": "Prompt Gambar",
-  "prompt-video": "Prompt Video Scene",
-  "prompt-narasi": "Prompt Narasi"
-};
+const modeButtons = document.querySelectorAll(".mode-button");
+const form = document.getElementById("promptForm");
+const resultBox = document.getElementById("result");
+const loading = document.getElementById("loading");
 
-let currentMode = "prompt-image";
+let currentMode = "image";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const modeButtons = document.querySelectorAll(".mode-button");
-  const promptInput = document.getElementById("prompt");
-  const outputDiv = document.getElementById("output");
+// Ganti URL ini dengan alamat Vercel kamu
+const PROXY_URL = "https://prompt-xi-coral.vercel.app/enchance";
 
-  // Switch mode
-  modeButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      currentMode = button.dataset.mode;
-      document.querySelector(".mode-button.active")?.classList.remove("active");
-      button.classList.add("active");
+modeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    currentMode = button.dataset.mode;
+    document.querySelector(".mode-button.active")?.classList.remove("active");
+    button.classList.add("active");
 
-      // Optional: Clear output & prompt on mode switch
-      outputDiv.textContent = "";
-      // promptInput.value = ""; // uncomment kalau mau kosongkan prompt saat ganti mode
+    // Tampilkan input sesuai mode
+    document.querySelectorAll(".mode-section").forEach((section) => {
+      section.style.display = "none";
     });
-  });
+    document.getElementById(`mode-${currentMode}`).style.display = "block";
 
-  // Generate button clicked
-  document.getElementById("generate").addEventListener("click", async () => {
-    const rawPrompt = promptInput.value.trim();
-    if (!rawPrompt) {
-      alert("Tolong masukkan prompt.");
-      return;
-    }
-
-    outputDiv.textContent = "Enhancing prompt with DeepSeek...";
-
-    try {
-      const response = await fetch("https://prompt-xi-coral.vercel.app/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: rawPrompt })
-      });
-
-      const data = await response.json();
-
-      if (data.enhanced_prompt) {
-        outputDiv.textContent = data.enhanced_prompt;
-      } else {
-        outputDiv.innerHTML = `<span style="color:red">Gagal meng-enhance prompt.</span>`;
-        console.error("Response error:", data);
-      }
-    } catch (error) {
-      outputDiv.innerHTML = `<span style="color:red">Error saat menghubungi server.</span>`;
-      console.error(error);
-    }
+    // Clear hasil sebelumnya
+    resultBox.value = "";
   });
 });
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  resultBox.value = "";
+  loading.style.display = "inline";
+
+  const prompt = buildPrompt();
+  if (!prompt) {
+    loading.style.display = "none";
+    alert("Isi semua kolom yang dibutuhkan.");
+    return;
+  }
+
+  try {
+    const response = await fetch(PROXY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt }),
+    });
+
+    const data = await response.json();
+
+    if (data.enhanced_prompt) {
+      resultBox.value = data.enhanced_prompt;
+    } else {
+      resultBox.value = "Gagal meng-enhance prompt.";
+      console.error(data);
+    }
+  } catch (err) {
+    resultBox.value = "Error saat menghubungi server.";
+    console.error(err);
+  } finally {
+    loading.style.display = "none";
+  }
+});
+
+function buildPrompt() {
+  if (currentMode === "image") {
+    const subject = document.getElementById("image-subject").value;
+    const action = document.getElementById("image-action").value;
+    const style = document.getElementById("image-style").value;
+    if (!subject || !action || !style) return "";
+
+    return `Describe an image of ${subject} who is ${action}, in a ${style} style.`;
+  }
+
+  if (currentMode === "video") {
+    const scene = document.getElementById("video-scene").value;
+    const movement = document.getElementById("video-movement").value;
+    const tone = document.getElementById("video-tone").value;
+    if (!scene || !movement || !tone) return "";
+
+    return `Describe a video scene: ${scene}, with ${movement}, in a ${tone} tone.`;
+  }
+
+  if (currentMode === "narrative") {
+    const character = document.getElementById("narrative-character").value;
+    const setting = document.getElementById("narrative-setting").value;
+    const plot = document.getElementById("narrative-plot").value;
+    if (!character || !setting || !plot) return "";
+
+    return `Write a narrative about ${character} in ${setting}, where ${plot}.`;
+  }
+
+  return "";
+}
