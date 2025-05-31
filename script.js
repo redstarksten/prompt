@@ -11,19 +11,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const promptInput = document.getElementById("prompt");
   const outputDiv = document.getElementById("output");
 
+  // Switch mode
   modeButtons.forEach(button => {
     button.addEventListener("click", () => {
       currentMode = button.dataset.mode;
       document.querySelector(".mode-button.active")?.classList.remove("active");
       button.classList.add("active");
+
+      // Optional: Clear output & prompt on mode switch
+      outputDiv.textContent = "";
+      // promptInput.value = ""; // uncomment kalau mau kosongkan prompt saat ganti mode
     });
   });
 
+  // Generate button clicked
   document.getElementById("generate").addEventListener("click", async () => {
     const rawPrompt = promptInput.value.trim();
-    if (!rawPrompt) return alert("Tolong masukkan prompt.");
+    if (!rawPrompt) {
+      alert("Tolong masukkan prompt.");
+      return;
+    }
 
-    outputDiv.innerHTML = "<em>Enhancing prompt with DeepSeek...</em>";
+    outputDiv.textContent = "Enhancing prompt with DeepSeek...";
 
     try {
       const response = await fetch("https://deepseek-proxy.glitch.me/enhance", {
@@ -38,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         outputDiv.textContent = data.enhanced_prompt;
       } else {
         outputDiv.innerHTML = `<span style="color:red">Gagal meng-enhance prompt.</span>`;
-        console.error("Respon error:", data);
+        console.error("Response error:", data);
       }
     } catch (error) {
       outputDiv.innerHTML = `<span style="color:red">Error saat menghubungi server.</span>`;
