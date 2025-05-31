@@ -1,85 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Prompt Generator</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
+<div id="mode-switch">
+  <button class="mode-button active" data-mode="prompt-image">Mode Gambar</button>
+  <button class="mode-button" data-mode="prompt-video">Mode Video Scene</button>
+  <button class="mode-button" data-mode="prompt-narasi">Mode Narasi</button>
+</div>
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 16px;
-    }
+<textarea id="prompt" placeholder="Masukkan prompt..."></textarea>
+<button id="generate">Generate</button>
 
-    .mode-btn {
-      padding: 8px 14px;
-      margin-right: 6px;
-      margin-bottom: 10px;
-      border: none;
-      background: #eee;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-
-    .mode-btn.active {
-      background: #007bff;
-      color: white;
-    }
-
-    input {
-      display: block;
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      padding: 10px 16px;
-      margin-top: 10px;
-      margin-right: 8px;
-      border: none;
-      background-color: #28a745;
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #resultContainer {
-      margin-top: 24px;
-      padding: 16px;
-      border: 1px solid #ccc;
-      background: #f9f9f9;
-      border-radius: 6px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Prompt Generator</h1>
-
-  <div>
-    <button class="mode-btn active" data-mode="image">Prompt Gambar</button>
-    <button class="mode-btn" data-mode="video">Prompt Video Scene</button>
-    <button class="mode-btn" data-mode="narrative">Prompt Narasi</button>
-  </div>
-
-  <div id="promptInputs"></div>
-
-  <button id="generateBtn">Generate Prompt</button>
-  <button id="enhanceBtn" style="display: none;">Enhance with DeepSeek</button>
-
-  <div id="resultContainer" class="hidden">
-    <h3>Hasil Prompt:</h3>
-    <div id="result" style="white-space: pre-wrap;"></div>
-  </div>
-
-  <script defer src="script.js"></script>
-</body>
-</html>
+<pre id="output"></pre>
