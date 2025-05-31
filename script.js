@@ -6,7 +6,7 @@ const loading = document.getElementById("loading");
 let currentMode = "image";
 
 // Ganti URL ini dengan alamat Vercel kamu
-const PROXY_URL = "https://prompt-xi-coral.vercel.app/enchance";
+const PROXY_URL = "https://prompt-xi-coral.vercel.app/enhance";
 
 modeButtons.forEach((button) => {
   button.addEventListener("click", () => {
