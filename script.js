@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     result.textContent = "Enhancing prompt with DeepSeek...";
 
     try {
-      const response = await fetch("https://api.deepseek.live/enhance", {
+      const response = await fetch("https://api.deepseek.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
