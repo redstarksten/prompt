@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const promptInputs = document.getElementById("promptInputs");
   const generateBtn = document.getElementById("generateBtn");
-  const enhanceBtn = document.getElementById("enhanceBtn");
   const resultContainer = document.getElementById("resultContainer");
   const result = document.getElementById("result");
   const modeButtons = document.querySelectorAll(".mode-btn");
+
+  let currentMode = "image";
 
   const modes = {
     image: [
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function renderFields(mode) {
+    currentMode = mode;
     promptInputs.innerHTML = "";
     modes[mode].forEach(field => {
       const label = document.createElement("label");
@@ -41,8 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
       promptInputs.appendChild(input);
     });
 
-    // Show Enhance button only in narrative mode
-    enhanceBtn.style.display = mode === "narrative" ? "inline-block" : "none";
     result.textContent = "";
     resultContainer.classList.add("hidden");
   }
@@ -57,50 +57,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  generateBtn.addEventListener("click", () => {
+  generateBtn.addEventListener("click", async () => {
     const inputs = promptInputs.querySelectorAll("input");
     const promptParts = Array.from(inputs)
       .map(i => i.value.trim())
       .filter(Boolean);
     const promptText = promptParts.join(", ");
 
-    result.textContent = promptText;
     resultContainer.classList.remove("hidden");
-  });
-
-  enhanceBtn.addEventListener("click", async () => {
-    const inputs = promptInputs.querySelectorAll("input");
-    const promptParts = Array.from(inputs)
-      .map(i => i.value.trim())
-      .filter(Boolean);
-    const promptText = promptParts.join(", ");
 
     if (!promptText) {
-      alert("Isi semua field dulu ya!");
+      result.textContent = "Isi semua field dulu ya!";
       return;
     }
 
-    result.textContent = "Menghubungi DeepSeek...";
-    resultContainer.classList.remove("hidden");
+    result.textContent = "Enhancing prompt with DeepSeek...";
 
     try {
       const response = await fetch("https://api.deepseek.live/enhance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer sk-854cdf1e9eff4de59471892e07f581e0" // 🔁 Ganti dengan API Key kamu
+          "Authorization": "Bearer sk-854cdf1e9eff4de59471892e07f581e0" // 🔁 Ganti dengan API Key asli
         },
         body: JSON.stringify({ prompt: promptText })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.statusText}`);
-      }
-
       const data = await response.json();
-      result.textContent = data.enhanced_prompt || "Gagal memproses prompt dari DeepSeek.";
+      result.textContent = data.enhanced_prompt || "Gagal enhance dengan DeepSeek.";
     } catch (error) {
-      result.textContent = "Error: " + error.message;
+      result.textContent = "Error saat menghubungi DeepSeek: " + error.message;
     }
   });
 
