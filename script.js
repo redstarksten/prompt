@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const promptInputs = document.getElementById("promptInputs");
   const generateBtn = document.getElementById("generateBtn");
+  const enhanceBtn = document.getElementById("enhanceBtn");
   const resultContainer = document.getElementById("resultContainer");
   const result = document.getElementById("result");
+  const modeButtons = document.querySelectorAll(".mode-btn");
 
   const modes = {
     image: [
@@ -27,26 +29,34 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderFields(mode) {
     promptInputs.innerHTML = "";
     modes[mode].forEach(field => {
-      const inputGroup = document.createElement("div");
-      inputGroup.innerHTML = `
-        <label for="${field.id}" class="block font-medium">${field.label}</label>
-        <input type="text" id="${field.id}" class="w-full p-2 border rounded" />
-      `;
-      promptInputs.appendChild(inputGroup);
+      const label = document.createElement("label");
+      label.textContent = field.label;
+      label.htmlFor = field.id;
+
+      const input = document.createElement("input");
+      input.id = field.id;
+      input.type = "text";
+
+      promptInputs.appendChild(label);
+      promptInputs.appendChild(input);
     });
+
+    // Show Enhance button only in narrative mode
+    enhanceBtn.style.display = mode === "narrative" ? "inline-block" : "none";
+    result.textContent = "";
+    resultContainer.classList.add("hidden");
   }
 
-  // Handle mode switch buttons
-  document.querySelectorAll(".mode-btn").forEach(btn => {
+  modeButtons.forEach(btn => {
     btn.addEventListener("click", () => {
+      modeButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
       const mode = btn.getAttribute("data-mode");
       renderFields(mode);
-      resultContainer.classList.add("hidden");
-      result.textContent = "";
     });
   });
 
-  // Handle Generate Prompt button
   generateBtn.addEventListener("click", () => {
     const inputs = promptInputs.querySelectorAll("input");
     const promptParts = Array.from(inputs)
@@ -54,11 +64,45 @@ document.addEventListener("DOMContentLoaded", () => {
       .filter(Boolean);
     const promptText = promptParts.join(", ");
 
-    // Show prompt output (DeepSeek enhancement can be added here)
     result.textContent = promptText;
     resultContainer.classList.remove("hidden");
   });
 
-  // Default mode is 'image'
+  enhanceBtn.addEventListener("click", async () => {
+    const inputs = promptInputs.querySelectorAll("input");
+    const promptParts = Array.from(inputs)
+      .map(i => i.value.trim())
+      .filter(Boolean);
+    const promptText = promptParts.join(", ");
+
+    if (!promptText) {
+      alert("Isi semua field dulu ya!");
+      return;
+    }
+
+    result.textContent = "Menghubungi DeepSeek...";
+    resultContainer.classList.remove("hidden");
+
+    try {
+      const response = await fetch("https://api.deepseek.live/enhance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer sk-854cdf1e9eff4de59471892e07f581e0" // 🔁 Ganti dengan API Key kamu
+        },
+        body: JSON.stringify({ prompt: promptText })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      result.textContent = data.enhanced_prompt || "Gagal memproses prompt dari DeepSeek.";
+    } catch (error) {
+      result.textContent = "Error: " + error.message;
+    }
+  });
+
   renderFields("image");
 });
