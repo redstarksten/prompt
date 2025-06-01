@@ -1,106 +1,150 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prompt Generator</title>
   <style>
     body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 2rem auto;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
       padding: 1rem;
+      background: #f0f4f8;
+      color: #333;
     }
-
-    .mode-button {
-      margin: 0.2rem;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      background-color: #eee;
+    h1 {
+      text-align: center;
     }
-
-    .mode-button.active {
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    label {
+      display: block;
+      margin: 1rem 0 0.25rem;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    button {
       background-color: #007bff;
       color: white;
+      cursor: pointer;
     }
-
-    .mode-section {
-      display: none;
-      margin-top: 1rem;
+    button:hover {
+      background-color: #0056b3;
     }
-
-    textarea {
-      width: 100%;
-      height: 160px;
-      margin-top: 1rem;
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
     }
-
-    button[type="submit"] {
-      margin-top: 1rem;
+    .tabs button {
+      flex: 1;
+      margin: 0 0.25rem;
+      background: #e0e0e0;
+      color: #333;
     }
-
-    #loading {
-      display: none;
-      margin-left: 0.5rem;
-      color: gray;
+    .tabs button.active {
+      background: #007bff;
+      color: white;
+    }
+    .output {
+      white-space: pre-wrap;
+      background: #fafafa;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
-  <h1>Prompt Generator</h1>
-
-  <div>
-    <button class="mode-button active" data-mode="image">Prompt Gambar</button>
-    <button class="mode-button" data-mode="video">Prompt Video Scene</button>
-    <button class="mode-button" data-mode="narrative">Prompt Narasi</button>
-  </div>
-
-  <form id="promptForm">
-    <!-- Mode Gambar -->
-    <div class="mode-section" id="mode-image" style="display: block;">
-      <label>Subjek:</label>
-      <input type="text" id="image-subject" placeholder="Contoh: seorang pemuda di tepi laut" required />
-      <br/>
-      <label>Aksi:</label>
-      <input type="text" id="image-action" placeholder="Contoh: sedang menatap cakrawala" required />
-      <br/>
-      <label>Gaya:</label>
-      <input type="text" id="image-style" placeholder="Contoh: realistik sinematik malam hari" required />
+  <div class="container">
+    <h1>Prompt Generator</h1>
+    <div class="tabs">
+      <button onclick="setMode('image')" class="active">Gambar</button>
+      <button onclick="setMode('video')">Video</button>
+      <button onclick="setMode('narrative')">Narasi</button>
     </div>
+    <form id="promptForm">
+      <div id="imageInputs">
+        <label>Subjek</label><input name="subject" required />
+        <label>Objek</label><input name="object" />
+        <label>Latar belakang lokasi</label><input name="background" />
+        <label>Tone warna</label><input name="colorTone" />
+        <label>Ekspresi</label><input name="expression" />
+        <label>Nuansa</label><input name="mood" />
+      </div>
+      <div id="videoInputs" style="display:none">
+        <label>Aksi Subjek</label><input name="action" />
+        <label>Gerakan Objek</label><input name="objectMovement" />
+        <label>Pergerakan Kamera</label><input name="cameraMovement" />
+        <label>Dialog</label><input name="dialog" />
+        <label>Waktu dan Lokasi</label><input name="sceneTimeLocation" />
+      </div>
+      <div id="narrativeInputs" style="display:none">
+        <label>Tokoh</label><input name="character" />
+        <label>Konflik atau Tema</label><input name="theme" />
+        <label>Gaya Bahasa</label><input name="style" />
+        <label>Suasana</label><input name="atmosphere" />
+      </div>
+      <button type="submit">Generate Prompt</button>
+    </form>
+    <div class="output" id="result"></div>
+  </div>  <script>
+    let mode = 'image';
 
-    <!-- Mode Video -->
-    <div class="mode-section" id="mode-video">
-      <label>Deskripsi Scene:</label>
-      <input type="text" id="video-scene" placeholder="Contoh: hujan deras di jalan kota" required />
-      <br/>
-      <label>Pergerakan Kamera:</label>
-      <input type="text" id="video-movement" placeholder="Contoh: dolly zoom ke wajah karakter" required />
-      <br/>
-      <label>Tone Gambar:</label>
-      <input type="text" id="video-tone" placeholder="Contoh: gelap, misterius, dramatis" required />
-    </div>
+    function setMode(newMode) {
+      mode = newMode;
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.tabs button[onclick="setMode('${mode}')"]`).classList.add('active');
 
-    <!-- Mode Narasi -->
-    <div class="mode-section" id="mode-narrative">
-      <label>Karakter:</label>
-      <input type="text" id="narrative-character" placeholder="Contoh: seorang detektif tua" required />
-      <br/>
-      <label>Setting:</label>
-      <input type="text" id="narrative-setting" placeholder="Contoh: kota yang penuh kabut" required />
-      <br/>
-      <label>Plot:</label>
-      <input type="text" id="narrative-plot" placeholder="Contoh: menyelidiki kasus hilangnya anak kecil" required />
-    </div>
+      document.getElementById('imageInputs').style.display = mode === 'image' ? '' : 'none';
+      document.getElementById('videoInputs').style.display = mode === 'video' ? '' : 'none';
+      document.getElementById('narrativeInputs').style.display = mode === 'narrative' ? '' : 'none';
+    }
 
-    <button type="submit">Generate Prompt</button>
-    <span id="loading">Enhancing prompt with DeepSeek...</span>
-  </form>
+    document.getElementById('promptForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const inputs = {};
+      form.forEach((value, key) => {
+        if (value) inputs[key] = value;
+      });
 
-  <h3>Hasil Prompt</h3>
-  <textarea id="result" readonly></textarea>
+      const promptTemplate = {
+        image: `Buat prompt gambar dengan detail berikut:\nSubjek: ${inputs.subject}\nObjek: ${inputs.object}\nLatar: ${inputs.background}\nTone Warna: ${inputs.colorTone}\nEkspresi: ${inputs.expression}\nNuansa: ${inputs.mood}`,
+        video: `Buat deskripsi adegan video sinematik:\nAksi Subjek: ${inputs.action}\nGerakan Objek: ${inputs.objectMovement}\nKamera: ${inputs.cameraMovement}\nDialog: ${inputs.dialog}\nSetting: ${inputs.sceneTimeLocation}`,
+        narrative: `Tulis narasi pendek berdasarkan:\nTokoh: ${inputs.character}\nTema: ${inputs.theme}\nGaya Bahasa: ${inputs.style}\nSuasana: ${inputs.atmosphere}`
+      };
 
-  <script src="script.js"></script>
-</body>
+      const prompt = promptTemplate[mode];
+
+      const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer sk-854cdf1e9eff4de59471892e07f581e0'
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: 'You are a helpful creative assistant.' },
+            { role: 'user', content: prompt }
+          ]
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById('result').innerText = data.choices?.[0]?.message?.content || 'Gagal mengambil hasil.';
+    });
+  </script></body>
 </html>
